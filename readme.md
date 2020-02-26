@@ -103,5 +103,5 @@ Automatic terminal logging ![Teminal Loggind](images/terminal_logs.png)
 
 Pipenv keep Python projects independent ![pipenv shell](images/pipenv_shell.png)
 
-Example of SilentTrinity running in pipenv environment ~[silenttrinity](images/pipenv.png)
+Example of SilentTrinity running in pipenv environment ![silenttrinity](images/pipenv.png)
 
