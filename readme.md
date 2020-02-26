@@ -8,7 +8,7 @@ The project is designed to be used as a starter process in creating, managing, a
 
 Detail on the concept of a Standard Attack Platform can be found it the book Red Team Development and Operations - A practical guide, written by Joe Vest and James Tubberville.
 
-![ThreatBox](threatbox.png)
+![ThreatBox](images/threatbox.png)
 ------------------------------------
 ## Features
 
@@ -91,4 +91,17 @@ ssh -p $sshport -i ~/.ssh/threatbox_id_rsa -L 5901:localhost:5901 root@$threatbo
 
 This project uses ansbile roles. These roles may not exactly follow the ansible style. They were designed to be used as part of this project and use a single 'variable' file to control the project. The roles can easily be used in other project with minor tweaks.
 
+## Features
+
+ThreatBox Custom Commands ![ThreatBox Help](images/help.png)
+
+Tool Categories ![Tool Categories](images/tool_category.png)
+
+Tracking of all installed tools ![Tool Tracking](images/tool_tracking.png)
+
+Automatic terminal logging ![Teminal Loggind](images/terminal_logs.png)
+
+Pipenv keep Python projects independent ![pipenv shell](images/pipenv_shell.png)
+
+Example of SilentTrinity running in pipenv environment ~[silenttrinity](images/pipenv.png)
 
