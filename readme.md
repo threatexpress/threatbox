@@ -1,11 +1,14 @@
 # Threatbox - Standard Attack Platform
 
+ThreatBox is a standard and controlled Linux based attack platform. I've used a version of this for years. It started as a collection of scripts, lived as a rolling virtual machine, existed as code to build a Linux ISO, and has now been converted to a set of ansible playbooks. Why Ansible? Why not? This seemed to be the next natural evolution to the configuration of standard attack platforms.
+
 This project uses ansible playbooks and roles to perform post deployment configuration on a linux target (Tested on Ubuntu 18.04).
 
 The project is designed to be used as a starter process in creating, managing, and using a standard attack platform for red teaming or penetration testing.
 
 Detail on the concept of a Standard Attack Platform can be found it the book Red Team Development and Operations - A practical guide, written by Joe Vest and James Tubberville.
 
+![ThreatBox](threatbox.png)
 ------------------------------------
 ## Features
 
@@ -87,24 +90,5 @@ ssh -p $sshport -i ~/.ssh/threatbox_id_rsa -L 5901:localhost:5901 root@$threatbo
 ## Notes on the project
 
 This project uses ansbile roles. These roles may not exactly follow the ansible style. They were designed to be used as part of this project and use a single 'variable' file to control the project. The roles can easily be used in other project with minor tweaks.
-
---------------
-## !!!! TODO !!!!
-
-- Review
-  - [x] readme
-  - [x] readme downloads
-  - [x] readme packages
-  - [x] readme python
-  - [x] deskop environment
-    - [x] vscode
-    - [ ] burp
-  - [x] features
-    - [x] event creation
-    - [x] theme change
-    - [x] other features
-- Add
-  - [x] Tested on Ubuntu18.04 note
- 
 
 
