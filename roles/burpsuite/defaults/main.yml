@@ -1,0 +1,9 @@
+---
+## defaults main.yml for role: burpsuite
+
+tools_root: /tools
+
+direct_download_files:
+    burpsuite:
+        category: web
+        url:  https://portswigger.net/burp/releases/download?product=community&version=2020.1&type=Linux

@@ -1,0 +1,9 @@
+---
+## defaults main.yml for role: crackmapexec
+
+tools_root: /tools
+
+git_repos:
+    silenttrinity:
+        category: c2
+        url: https://github.com/byt3bl33d3r/CrackMapExec

@@ -1,0 +1,41 @@
+---
+## tasks main.yml for role: proxychains-ng
+## This role installs proxychains-ng
+
+##########################
+## Install proxychains-ng
+
+## Note: Download of the source is controlled in the threatbox.yml file. 
+##       It's best to enable all downloads in that file. 
+##       This help to maintain software package tracking.
+
+- name: Set proxychains-ng path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'proxychains-ng' in item.key" 
+
+
+### Check if tool_path exists
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Running ./configure for proxychains-ng
+  shell: ./configure --prefix=/usr --sysconfdir=/etc
+  args:
+    chdir: "{{ tool_path }}"
+
+
+- name: Running "make install" for proxychains-ng
+  shell: "make && make install-config"
+  args:
+    chdir: "{{ tool_path }}"
+

@@ -1,0 +1,203 @@
+---
+## defaults main.yml for role: common
+
+operator_username: "operator"
+#https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+# Clear password: 'operatorPassword123!@#'
+operator_password: '$6$o3Td5VWG4Ouf.TzZ$FKp3XkAMT0T4ntaGXKFSo414pzyJHFGrAekd6NVRqY3lvT6PB.X9m7D119xv.vwmKrBL38pjRIlpOveP.3H.V.'
+
+tools_root: /tools # Tools directory 
+logs_root: /data # Engagement and operator logs directory
+
+required_directories: [
+    "{{ tools_root }}",
+    "{{ logs_root }}"
+]
+
+software_packages: [
+    apt-transport-https,
+    ca-certificates,
+    software-properties-common,
+    build-essential,
+    curl,
+    dpkg,
+    firefox,
+    gnupg,
+    git,
+    imagemagick-6.q16,   
+    openjdk-8-jre,
+    john,
+    jq,
+    libgmp-dev,
+    libbz2-dev,
+    libffi-dev,
+    libpcap-dev,
+    libpcap0.8,
+    libssl-dev,
+    nmap,
+    nuget,
+    mosh,
+    p7zip-full,
+    pkg-config,
+    python-crypto,
+    python-dev,
+    python-libpcap,
+    python-lzma,
+    python-pip,
+    python3,
+    python3-pip,
+    python-crypto,
+    python-pyasn1,
+    virtualenv,
+    python3-setuptools,
+    smbclient,
+    tcpdump,
+    tightvncserver,
+    tmux,
+    unrar,
+    wget,
+    wireshark,
+    xfce4,
+    xfce4-goodies,
+    xfce4-terminal,
+    unzip,
+    openjdk-8-jdk,
+    openjdk-8-jre,
+    binwalk,
+    tigervnc-standalone-server,
+    tigervnc-xorg-extension,
+    tshark,
+    ufw,
+    freerdp2-x11,
+    yasm
+]   
+
+git_repos:
+    impacket:
+        category: network
+        url: https://github.com/SecureAuthCorp/impacket
+    inveigh: 
+        category: network
+        url: https://github.com/Kevin-Robertson/Inveigh
+    responder:
+        category: network
+        url: https://github.com/SpiderLabs/Responder
+    johntheripper:
+        category: password
+        url: https://github.com/magnumripper/JohnTheRipper
+    domainpasswordspray:    
+        category: password
+        url: https://github.com/dafthack/DomainPasswordSpray
+    tinyshell:    
+        category: web
+        url: https://github.com/threatexpress/tinyshell
+    invoke-thehash:
+        category: windows
+        url: https://github.com/Kevin-Robertson/Invoke-TheHash
+    seatbelt:
+        category: ghostpack
+        url: https://github.com/GhostPack/Seatbelt
+    sharpup:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpUp
+    sharpdump:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpDump
+    safetykatz:
+        category: ghostpack
+        url: https://github.com/GhostPack/SafetyKatz
+    sharproast:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpRoast
+    sharpwmi:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpWMI
+    sharpdpapi:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpDPAPI
+    internam-monologue:
+        category: windows
+        url: https://github.com/eladshamir/Internal-Monologue
+    sharphound:
+        category: enumeration
+        url: https://github.com/BloodHoundAD/SharpHound
+    powersploit:
+        category: windows
+        url: https://github.com/PowerShellMafia/PowerSploit
+    elite:
+        category: c2
+        url: https://github.com/cobbr/Elite
+    covenant:
+        category: c2
+        url: https://github.com/cobbr/Covenant
+    red-teaming-toolkit:
+        category: resource
+        url: https://github.com/infosecn1nja/Red-Teaming-Toolkit
+    awesome-red-teaming:
+        category: resource
+        url: https://github.com/yeyintminthuhtut/Awesome-Red-Teaming
+    domainhunter:
+        category: recon
+        url: https://github.com/threatexpress/domainhunter
+    c2modrewrite:
+        category: general
+        url: https://github.com/threatexpress/cs2modrewrite
+    red-team-scripts:
+        category: resource
+        url: https://github.com/threatexpress/red-team-scripts
+    malleable-c2:
+        category: c2
+        url: https://github.com/threatexpress/malleable-c2
+    pasties:
+        category: resource
+        url: https://github.com/threatexpress/pasties
+    edc:
+        category: reporting
+        url: https://github.com/threatexpress/edc
+    eyewitness:
+        category: web
+        url: https://github.com/FortyNorthSecurity/EyeWitness.git
+    sqlmap:
+        category: web
+        url: https://github.com/sqlmapproject/sqlmap.git
+    sharpclipboard:
+        category: windows
+        url: https://github.com/slyd0g/SharpClipboard.git
+    powerupsql:
+        category: priv_esc
+        url: https://github.com/NetSPI/PowerUpSQL.git
+    silenttrinity:
+        category: c2
+        url: https://github.com/byt3bl33d3r/SILENTTRINITY
+    proxychains-ng:
+        category: general
+        url: https://github.com/rofl0r/proxychains-ng
+
+direct_download_files:
+    merlin:
+        category: c2
+        url:  https://github.com/Ne0nd0g/merlin/releases/download/v0.7.0/merlinServer-Linux-x64-v0.7.0.BETA.7z
+    sysinternals:
+        category: windows
+        url:  https://download.sysinternals.com/files/SysinternalsSuite.zip
+    metasploit:
+        category: c2
+        url:  https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb
+    rockyou:
+        category: password
+        url:  http://downloads.skullsecurity.org/passwords/rockyou.txt.bz2
+    burpsuite:
+        category: web
+        url:  https://portswigger.net/burp/releases/download?product=community&version=2020.1&type=Linux
+    
+python_modules: [
+    boto3,
+    docopt,
+    xmltodict,
+    requests,
+    argparse,
+    certifi,
+    chardet,
+    idna,
+    urllib3,
+]

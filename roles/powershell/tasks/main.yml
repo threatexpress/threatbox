@@ -1,0 +1,8 @@
+## tasks main.yml for role: powershell
+---
+##########################
+## Install Powershell
+- name: Install PowerShell
+  snap:
+    name: powershell
+    classic: yes

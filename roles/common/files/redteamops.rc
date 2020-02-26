@@ -1,0 +1,282 @@
+##################################
+# THREATBOX custom terminal settings, functions, and other operator tips
+
+# Test data directories
+[ ! -d $HOME/logs ] && mkdir $HOME/logs
+[ ! -d $HOME/logs/screenshots ] && mkdir -p $HOME/logs/screenshots
+[ ! -d $HOME/logs/terminals ] && mkdir -p $HOME/logs/terminals
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias grep='grep --color=auto'
+fi
+
+# Aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias treedir="ls -Ra | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'"
+alias webserver='twistd -no web --path .'
+
+function mkcd() {
+    mkdir -p "$@"
+    cd "$@"
+}
+
+
+function get_timestamp {
+   # Get UTC timestamp
+   echo $(date '+%Y-%m-%d %H:%M:%S %Z')
+}
+
+function my_ip {
+   # Get current local IP addresses
+   /sbin/ip -4 addr show | grep 'inet ' | grep 'eth0' | awk '{ print $2 }'
+}
+
+function ql {
+   # Save a log to ~/logs/quick_logs.txt
+   echo $(get_timestamp) - $(USER) [$(my_ip)] - $@ | tee -a ~/logs/quick_logs.txt
+}
+
+
+# # Encrypted Tools
+# function mount_tools() {
+#     TOOLSDIR="/tools"
+#     if [ -f "$HOME/.toolspw" ]; then
+#         mountphrase=$(cat ${HOME}/.toolspw)
+#     else
+#         echo -n "Mount passphrase: "
+#         read -s mountphrase
+#     fi
+#     printf "%s" "${mountphrase}" | ecryptfs-add-passphrase > /tmp/tmp.txt
+#     sig=`tail -1 /tmp/tmp.txt | awk '{print $6}' | sed 's/\[//g' | sed 's/\]//g'`
+#     rm -f /tmp/tmp.txt
+#     mount -t ecryptfs -o key=passphrase:passphrase_passwd=${mountphrase},no_sig_cache=yes,verbose=no,ecryptfs_fnek_sig=${sig},ecryptfs_sig=${sig},ecryptfs_cipher=aes,ecryptfs_key_bytes=16,ecryptfs_passthrough=no,ecryptfs_enable_filename_crypto=yes $TOOLSDIR $TOOLSDIR
+#     unset mountphrase
+#     if [ ! -f "${TOOLSDIR}/.success" ]; then
+#         echo "Bad password."
+#         umount /tools
+#     fi
+# }
+
+# alias unmount_tools="umount /tools"
+
+CURDATE=`date '+%Y%m%d_%H%M%S.%N_%Z'`
+
+# Get External IP address
+alias external_ip="curl ifconfig.me"
+
+# Get process using network communications
+alias netstati="lsof -P -i -n"
+
+# Make history more readable.
+HISTTIMEFORMAT="%F %T "
+
+############################
+# Colors
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+BRIGHT=$(tput bold)
+NORMAL=$(tput sgr0)
+BLINK=$(tput blink)
+REVERSE=$(tput smso)
+UNDERLINE=$(tput smul)
+
+# Color Themes
+#DEFAULT='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+DEFAULT=$PS1
+
+#     Top curve color                 -                    Checkbox color ( green or red )      - Reset color - timestamp color -       user/host color -  IP color -       downbar color -  curdir color - reset color - text color 
+DARK="\n\[$WHITE\]╭ [\$(if [[ \$? == 0 ]]; then echo \"\[$GREEN\]✓\"; else echo \"\[$RED\]✕\"; fi) \[$WHITE\]\[$YELLOW\]\D{%Y-%m-%d %T%z} \[$WHITE\]\u@\h \[${CYAN}\]$(my_ip)\[$WHITE\]]\n├ [\[$GREEN\]\w\[$WHITE\]]\n\[$WHITE\]╰ "
+LIGHT="\n\[$BLACK\]╭ [\$(if [[ \$? == 0 ]]; then echo \"\[$GREEN\]✓\"; else echo \"\[$RED\]✕\"; fi) \[$BLACK\]\[$BLUE\]\D{%Y-%m-%d %T%z} \[$BLACK\]\u@\h \[${CYAN}\]$(my_ip)\[$BLACK\]]\n├ [\[$GREEN\]\w\[$WHITE\]]\n\[$BLACK\]╰ "
+NEUTRAL="\n\[$BLACK\]╭ [\$(if [[ \$? == 0 ]]; then echo \"\[$BLACK\]✓\"; else echo \"\[$BLACK\]✕\"; fi) \[$BLACK\]\[$BLACK\]\D{%Y-%m-%d %T%z} \[$BLACK\]\u@\h \[${BLACK}\]$(my_ip)\[$BLACK\]]\n├ [\[$BLACK\]\w\[$BLACK\]]\n\[$BLACK\]╰ "
+
+THEME=$DEFAULT
+PS1=$THEME
+
+# Set theme for default prompt
+function theme_default() {
+     PS1=$DEFAULT
+}
+
+# Set theme for neutral prompt
+function theme_neutral() {
+     if [ "$EUID" -ne 0 ]; then
+        p="$ "
+        PS1=$NEUTRAL$p  
+        setterm --inversescreen on    
+     else 
+        p="# "
+        PS1=$NEUTRAL$p
+        setterm --inversescreen on    
+     fi
+
+}
+
+# Set theme for light background
+function theme_light() {
+     if [ "$EUID" -ne 0 ]; then
+        p="$ "
+        PS1=$LIGHT$p   
+        setterm --inversescreen on  
+     else 
+        p="# "
+        PS1=$LIGHT$p
+        setterm --inversescreen on
+     fi
+
+}
+
+# Set theme for dark background
+function theme_dark() {
+     if [ "$EUID" -ne 0 ]; then
+        p="$ "
+        PS1=$DARK$p   
+        setterm --inversescreen off    
+     else 
+        p="# "
+        PS1=$DARK$p
+        setterm --inversescreen off    
+
+     fi
+
+}
+
+# Attack Platform Help
+function threatbox_help() {
+
+echo "
+*********************
+Attack Platform Guide
+*********************
+HOSTNAME: $(hostname)
+IP $(my_ip)
+
+Platform Terminal Functions
+---------------------------
+Platform Functions
+ * threatbox_help - Display this help
+ * my_ip          - Display the current IP address
+ * external_ip    - Reachout to ifconfig.me to get external IP address
+ * netstati       - Get process using network communications
+ * ql             - Log passed parameters to ~/logs/quick_logs.txt
+ * powershell     - runs Microsoft PowerShell prompt
+ * get_timestamp  - Get current UTC timestamp
+ * webserver    - Quick webserver on port 8080 using twisted
+
+Event Functions
+ Pass the event name as a parameter to any of the following functions.
+ * create_event <event_name>
+ * backup_event <event_name>
+ * archive_event <event_name>
+ * remove_event <event_name>
+
+Console Display Theme
+
+   Console themes provide additions prompt information. (Great for screenshots)
+
+ * theme_default - Default terminal prompt (DEFAULT)
+ * theme_neutral - Dark text on light background, no color
+ * theme_dark - Light text and terminal colors for dark background
+ * theme_light - Dark text and terminal colors for light background
+" 
+}
+
+
+
+#########################################
+# Event Management
+export EVENT_DIR="/data"
+export EVENT_BACKUP="/data/backups"
+
+# Ensure directories are available
+[ ! -d $EVENT_DIR ] && mkdir -p $EVENT_DIR
+[ ! -d $EVENT_BACKUP ] && mkdir -p $EVENT_BACKUP
+
+function sanitize_name() {
+   event_name=$(echo "${@//[^a-zA-Z0-9_-]/}" | sed 's/\ /_/g')
+   echo $event_name
+}
+
+convert_name() {
+   if [ $# -eq 0 ]
+   then
+      echo "No arguments supplied"
+   fi
+
+   if [ -z "$1" ]
+     then
+       echo "No argument supplied"
+   fi
+   sanitize_name $@
+}
+
+function create_event() {
+   echo "Creating event $@"
+   event="$(convert_name $@)"
+   if [ -d ${EVENT_DIR}/$event ]; then
+      echo "Event directory already present. Aborting"
+      return
+   fi
+   cp -a /etc/event_skeleton ${EVENT_DIR}/$event
+}
+
+function backup_event() {
+   echo "Backing up event $@"
+   event="$(convert_name $@)"
+   if [ ! -d ${EVENT_DIR}/$event ]; then
+      echo "Event not found"
+      return
+   fi
+   [ ! -d $EVENT_BACKUP ] && mkdir -p $EVENT_BACKUP
+   curdate=$(date '+%Y%m%d_%H%M%S%Z')
+   tar cjpf ${EVENT_BACKUP}/${curdate}_${event}_backup.tbz -C ${EVENT_DIR} $event
+   echo "Event backed up to ${EVENT_BACKUP}/${curdate}_${event}_backup.tbz"
+}
+
+function remove_event() {
+   echo "Removing event $@"
+   event="$(convert_name $@)"
+   if [ ! -d "${EVENT_DIR}/$event" ]; then
+      echo "Event not found"
+      return 
+   fi
+   rm -fr ${EVENT_DIR}/$event
+   echo "Event removed"
+}
+
+function archive_event() {
+   echo "Archiving event $@"
+   event="$(convert_name $@)"
+   if [ ! -d "${EVENT_DIR}/$event" ]; then
+      echo "Event not found"
+      return
+   fi
+   TARGET_FILE="${EVENT_DIR}/${curdate}_${event}_archive.tbz"
+   tar cjpf $TARGET_FILE -C ${EVENT_DIR} $event
+   remove_event $event
+   echo "Event archived to ${TARGET_FILE}."
+}
+
+## Terminal logging
+array=("gnome-terminal-" "gnome-terminal" "tmux" "termin" "x-term" "xfce4-terminal" "terminator")  
+search_string=`basename $(ps -f -p $PPID -o comm=)` 
+match=$(echo "${array[@]:0}" | grep -o $search_string)  
+
+if [[ $TERM == "xterm"* ]] && [[ ! -z $match ]]; then
+    logname="${HOME}/logs/terminals/${CURDATE}.terminal.log"
+    printf "This is a logged terminal session....\n"
+    script -f ${logname}.raw
+    cat ${logname}.raw | perl -pe 's/\e([^\[\]]|\[.*?[a-zA-Z]|\].*?\a)//g' | col -b > ${logname}
+    exit
+fi

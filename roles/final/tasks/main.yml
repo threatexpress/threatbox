@@ -1,0 +1,29 @@
+---
+## tasks main.yml for role: final
+## This role perform final steps 
+
+###########################
+### Final Steps
+- name: Chown {{ tools_root }} to {{ operator_username }} user
+  file:
+    path: "{{ tools_root }}"
+    recurse: yes
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+
+- name: Chown /home/{{ operator_username }} to {{ operator_username }} user
+  file:
+    path: "/home/{{ operator_username }}"
+    recurse: yes
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+
+- name: Chown {{ logs_root }} to {{ operator_username }} user
+  file:
+    path: "{{ logs_root }}"
+    recurse: yes
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+
+- name: Unconditionally reboot the machine with all defaults
+  reboot:

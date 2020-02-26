@@ -1,0 +1,36 @@
+---
+## tasks main.yml for role: johntheripper
+## This role install JohnTheRipper
+
+##########################
+## Install JohnTheRipper
+
+- name: Set JohnTheRipper path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'johntheripper' in item.key" 
+
+
+### Check if tool_path exists
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Running ./configure for John
+  shell: ./configure
+  args:
+    chdir: "{{ tool_path }}/src"
+
+
+- name: Running "make install" for John
+  shell: 'make -sj4'
+  args:
+    chdir: "{{ tool_path }}/src"

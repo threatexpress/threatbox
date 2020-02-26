@@ -1,0 +1,4 @@
+---
+## meta main.yml for role: johntheripper
+dependencies:
+  - setupssh

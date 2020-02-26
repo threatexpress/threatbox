@@ -1,0 +1,28 @@
+---
+- hosts: all
+  become: true
+  gather_facts: no #setupssh handles this. Allows the SSH port to be changed
+  roles:
+    - { role: setupssh, tags: [setupssh]}
+    - { role: common, tags: [common]}
+    - { role: tigervnc, tags: [tigervnc]}
+    - { role: docker, tags: [docker]}
+    - { role: powershell, tags: [powershell]}
+    - { role: vscode, tags: [vscode]}
+    - { role: proxychainsng, tags: [proxychainsng]}
+    - { role: johntheripper, tags: [johntheripper]}
+    - { role: metasploit, tags: [metasploit]}
+    - { role: metasploit, tags: [metasploit]}
+    - { role: silenttrinity, tags: [silenttrinity]}
+    - { role: crackmapexec, tags: [crackmapexec]}
+    - { role: domainhunter, tags: [domainhunter]}
+    - { role: burpsuite, tags: [burpsuite]}
+    - { role: bloodhound, tags: [bloodhound]}
+    - { role: merlin, tags: [merlin]}
+    - { role: mono, tags: [mono]}
+    - { role: compiled_dotnet_projects, tags: [compiled_dotnet_projects]}
+    - { role: dotnetcore, tags: [dotnetcore]}
+    - { role: covenant, tags: [covenant]}
+    - { role: impacket, tags: [impacket]}
+    - { role: passwords, tags: [passwords]}
+    - { role: final, tags: [final]}

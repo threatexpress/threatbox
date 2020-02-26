@@ -1,0 +1,109 @@
+## tasks main.yml for role: tigervnc
+---
+##########################
+## Tiger VNC
+- name: Configure TigerVNC service
+  copy:
+    dest: /etc/systemd/system/vncserver@.service
+    owner: root
+    group: root
+    content: |
+      [Unit]
+      Description=Start TigerVNC server for "{{ operator_username }}" user at startup
+      After=syslog.target network.target
+
+      [Service]
+      Type=forking
+      User={{ operator_username }}
+      Group={{ operator_username }}
+      WorkingDirectory=/home/{{ operator_username }}
+
+      ExecStartPre=-/usr/bin/vncserver -kill :%i > /dev/null 2>&1
+      ExecStart=/usr/bin/vncserver :%i -localhost no -geometry 1280x760 -SecurityType VncAuth
+      ExecStop=/usr/bin/vncserver -kill :%i
+      Restart=always
+      RestartSec=5s
+
+      [Install]
+      WantedBy=multi-user.target
+    # backup: yes
+
+
+- name: Set VNC password with vncpasswd
+  raw: printf {{ vnc_password_cmd }} | vncpasswd
+  become: yes
+  become_user: "{{ operator_username }}"
+
+
+- name: Create Xresources file
+  copy:
+    content: ""
+    dest: "/home/{{ operator_username }}/.Xresources"
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+    force: no
+
+
+- name: Configure {{ operator_username }} vnc xstartup
+  copy:
+    dest: "/home/{{ operator_username }}/.vnc/xstartup"
+    content: |
+      #!/bin/bash
+
+      xrdb $HOME/.Xresources
+      vncconfig -nowin &
+      startxfce4 &
+    #backup: yes
+
+
+- name: Make xstartup executable
+  file:
+    path: "/home/{{ operator_username }}/.vnc/xstartup"
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+    mode: 0755
+
+
+- name: Set owner to user for all files in home directory
+  file:
+    dest: "/home/{{ operator_username }}"
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+    recurse: yes
+
+
+- name: Chown VNC password file to {{ operator_username }} user
+  file:
+    path: "/home/{{ operator_username }}/.vnc/passwd"
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+
+
+- name: Enable VNC service on startup
+  systemd:
+    enabled: yes
+    daemon_reload: yes
+    name: vncserver@1
+
+- name: Start vnc service, if not started
+  service:
+    name: vncserver@1
+    state: started
+
+
+- name: Chown VNC password file to {{ operator_username }} user
+  file:
+    path: "/home/{{ operator_username }}/"
+    state: directory
+    recurse: yes
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+
+
+- name: Chown VNC password file to {{ operator_username }} user
+  file:
+    path: "/run/user/"
+    state: directory
+    recurse: yes
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"

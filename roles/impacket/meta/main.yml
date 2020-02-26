@@ -1,0 +1,5 @@
+---
+## meta main.yml for role: impacket
+
+dependencies:
+  - setupssh

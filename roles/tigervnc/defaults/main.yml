@@ -1,0 +1,19 @@
+---
+## defaults main.yml for role: tigervnc
+
+operator_username: "operator"
+
+tools_root: /tools # Tools directory 
+logs_root: /data # Engagement and operator logs directory
+
+required_directories: [
+    "{{ tools_root }}",
+    "{{ logs_root }}"
+]
+
+# VNC Auth password 
+# NOTE
+#     must be atleast 6 characters)
+#     the variable feeds this command to a oneliner password change and include the appropriate quotes
+#       printf {{ vnc_password_cmd }} | vncpasswd
+vnc_password_cmd: '"operator\noperator\nn"'

@@ -1,0 +1,63 @@
+---
+## tasks main.yml for role: silenttrinity
+
+##########################
+## SilentTrinity
+
+- name: Set SilentTrinity path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'silenttrinity' in item.key" 
+
+
+### Check if tool_path exists
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Install SilentTrinity - clean current pipenv
+  shell: "pipenv --rm"
+  args:
+    chdir: "{{ tool_path }}"
+  ignore_errors: yes
+
+
+- name: Install SilentTrinity - set pipenv to python3.7
+  shell: "pipenv --python 3.7"
+  args:
+    chdir: "{{ tool_path }}"
+
+
+- name: Install SilentTrinity - Remove Pipfile files (requirements.txt is the source of truth here)
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+      - "{{ tool_path }}/Pipfile"
+      - "{{ tool_path }}/Pipfile.lock"
+
+
+- name: Install SilentTrinity - pipenv install
+  shell: "pipenv install"
+  args:
+    chdir: "{{ tool_path }}"
+  async: 900
+  poll: 30
+
+
+- name: Install SilentTrinity - pipenv install impacket
+  shell: "pipenv install -e git+https://github.com/SecureAuthCorp/impacket#egg=impacket"
+  args:
+    chdir: "{{ tool_path }}"
+  async: 900
+  poll: 30
+
+  

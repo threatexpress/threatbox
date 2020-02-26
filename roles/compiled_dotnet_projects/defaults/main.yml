@@ -1,0 +1,37 @@
+---
+## defaults main.yml for role: compiled_dotnet_projects
+
+operator_username: operator
+tools_root: /tools
+
+git_repos:
+    seatbelt:
+        category: ghostpack
+        url: https://github.com/GhostPack/Seatbelt
+    sharpup:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpUp
+    sharpdump:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpDump
+    safetykatz:
+        category: ghostpack
+        url: https://github.com/GhostPack/SafetyKatz
+    sharproast:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpRoast
+    sharpwmi:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpWMI
+    sharpdpapi:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpDPAPI
+    internam-monologue:
+        category: windows
+        url: https://github.com/eladshamir/Internal-Monologue
+    sharphound:
+        category: enumeration
+        url: https://github.com/BloodHoundAD/SharpHound
+    sharpclipboard:
+        category: windows
+        url: https://github.com/slyd0g/SharpClipboard.git

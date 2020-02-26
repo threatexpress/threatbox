@@ -1,0 +1,60 @@
+---
+## tasks main.yml for role: Covenant
+## This role installs Covenant
+
+###########################
+## Build Covenant C2 with .net core
+
+## Note: Download of the source is controlled in the threatbox.yml file. 
+##       It's best to enable all downloads in that file. 
+##       This help to maintain software package tracking.
+
+## Covenant
+- name: Set Covenant path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'covenant' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Install Covenant
+  command: dotnet build
+  args:
+    chdir: "{{ tool_path }}"
+
+
+## Elite
+- name: Set Covenant path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'elite' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Install Elite
+  command: dotnet build
+  args:
+    chdir: "{{ tool_path }}"
+

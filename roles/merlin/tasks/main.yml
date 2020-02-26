@@ -1,0 +1,42 @@
+## tasks main.yml for role: merlin
+---
+## Note: Download of the source is controlled in the threatbox.yml file. 
+##       It's best to enable all downloads in that file. 
+##       This help to maintain software package tracking.
+
+##########################
+## Merlin
+- name: Set merlin path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', direct_download_files) }}"
+  when: "'merlin' in item.key" 
+
+
+### Check if tool_path exists
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Uncompress merlin
+  shell: "7z -y -pmerlin x {{ tool_path }}/{{ item.value.url | basename }}"
+  loop: "{{ lookup('dict', direct_download_files) }}"
+  when: "'merlin' in item.key" 
+  args:
+    chdir: "{{ tool_path }}"
+
+
+- name: Setup Merlin Self Signed Certificate
+  shell: "openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj '/C=US/ST=California/L=Cupertino/O=HQ/CN=www.apple.com' -keyout {{ tool_path }}/data/x509/server.key  -out {{ tool_path }}/data/x509/server.crt"
+  loop: "{{ lookup('dict', direct_download_files) }}"
+  when: "'merlin' in item.key" 
+  args:
+    chdir: "{{ tool_path }}"
+

@@ -1,0 +1,64 @@
+---
+## tasks main.yml for role: domainhunter
+
+##########################
+## domainhunter
+
+- name: Set domainhunter path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'domainhunter' in item.key" 
+
+
+### Check if tool_path exists
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: domainhunter - install required packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - tesseract-ocr
+    - python3-pil
+
+
+- name: Install domainhunter - clean current pipenv
+  shell: "pipenv --rm"
+  args:
+    chdir: "{{ tool_path }}"
+  ignore_errors: yes
+
+
+- name: Install domainhunter - set pipenv to python3.7
+  shell: "pipenv --python 3.7"
+  args:
+    chdir: "{{ tool_path }}"
+
+
+- name: Install domainhunter - Remove Pipfile files (requirements.txt is the source of truth here)
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+      - "{{ tool_path }}/Pipfile"
+      - "{{ tool_path }}/Pipfile.lock"
+
+
+- name: Install domainhunter - pipenv install
+  shell: "pipenv install"
+  args:
+    chdir: "{{ tool_path }}"
+  async: 900
+  poll: 30
+

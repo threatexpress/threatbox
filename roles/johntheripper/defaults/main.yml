@@ -1,0 +1,9 @@
+---
+## defaults main.yml for role: johntheripper
+
+tools_root: /tools
+
+git_repos:
+    johntheripper:
+        category: password
+        url: https://github.com/magnumripper/JohnTheRipper

@@ -1,0 +1,26 @@
+---
+## tasks main.yml for role: dotnetcore
+## This role downloads and installs dotnetcore
+
+###########################
+## Install .net Core
+- name: Download .net Core
+  get_url:
+    url: https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
+    dest: /tmp/packages-microsoft-prod.deb
+    mode: 0755
+  register: netcore
+
+- name: Install .net Core
+  when: netcore.changed
+  command: dpkg -i packages-microsoft-prod.deb
+  args:
+    chdir: /tmp/
+
+- name: Install dotnet-sdk-3.1
+  apt: name=dotnet-sdk-3.1 state=latest update_cache=yes force_apt_get=yes
+  register: dotnetsdk31
+
+- name: Install dotnet-sdk-2.2 (Needed for Covenant)
+  apt: name=dotnet-sdk-2.2 state=latest update_cache=yes force_apt_get=yes
+  register: dotnetsdk22

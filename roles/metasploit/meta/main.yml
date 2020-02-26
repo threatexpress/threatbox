@@ -1,0 +1,4 @@
+---
+## meta main.yml for role: metasploit
+dependencies:
+  - setupssh

@@ -1,0 +1,25 @@
+## tasks main.yml for role: vscode
+---
+##########################
+## Install VS code
+- name: Ensure required system packages are installed for VSCode
+  apt: name={{ item }} state=latest update_cache=yes
+  loop: [ 'apt-transport-https', 'curl', 'software-properties-common']
+
+  
+- name: Add Microsoft GPG Key
+  apt_key:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+
+
+- name: Add VSCode Repository
+  apt_repository:
+    repo: deb https://packages.microsoft.com/repos/vscode stable main
+    state: present
+
+
+- name: Update apt and install VSCode
+  apt: update_cache=yes name=code state=latest
+
+

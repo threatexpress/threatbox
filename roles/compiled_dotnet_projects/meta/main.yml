@@ -1,0 +1,4 @@
+---
+## meta main.yml for role: compiled_dotnet_projects
+dependencies:
+  - setupssh

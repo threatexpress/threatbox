@@ -1,0 +1,12 @@
+---
+## defaults main.yml for role: covenant
+
+tools_root: /tools
+
+git_repos:
+    elite:
+        category: c2
+        url: https://github.com/cobbr/Elite
+    covenant:
+        category: c2
+        url: https://github.com/cobbr/Covenant

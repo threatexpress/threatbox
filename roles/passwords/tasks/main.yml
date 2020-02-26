@@ -1,0 +1,32 @@
+## tasks main.yml for role: passwords
+---
+##########################
+## Add password databases to this role
+
+- name: Set rockyou path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', direct_download_files) }}"
+  when: "'rockyou' in item.key" 
+
+
+### Check if tool_path exists
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Uncompress rockyou
+  shell: "/bin/bunzip2 -f -k {{ tool_path }}/{{ item.value.url | basename }}"
+  loop: "{{ lookup('dict', direct_download_files) }}"
+  when: "'rockyou' in item.key" 
+  args:
+    chdir: "{{ tool_path }}"
+
+

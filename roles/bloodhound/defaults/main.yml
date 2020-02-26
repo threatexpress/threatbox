@@ -1,0 +1,9 @@
+---
+## defaults main.yml for role: bloodhound
+
+tools_root: /tools
+
+direct_download_files:
+    bloodhound:
+        category: enumeration
+        url:  https://github.com/BloodHoundAD/BloodHound/releases/download/3.0.1/BloodHound-linux-x64.zip

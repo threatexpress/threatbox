@@ -1,0 +1,9 @@
+---
+## defaults main.yml for role: passwords
+
+tools_root: /tools
+
+direct_download_files:
+    rockyou:
+        category: password
+        url:  http://downloads.skullsecurity.org/passwords/rockyou.txt.bz2

@@ -1,0 +1,341 @@
+---
+## tasks main.yml for role: compiled_dotnet_projects
+## This role compiles several Windows .net tools using dotnetcore
+
+## Note: Download of the source is controlled in the threatbox.yml file. 
+##       It's best to enable all downloads in that file. 
+##       This help to maintain software package tracking.
+
+- name: Create necessary directories if non-existent
+  file:
+    path: "{{ tools_root }}/windows/compiled_dotnet_projects"
+    state: directory
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+    mode: 0750
+
+
+###########
+## Seatbelt
+- name: Set seatbelt path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'seatbelt' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Check if Seatbelt_4.5.exe exists
+  stat:
+    path: "{{ tools_root }}/windows/compiled_dotnet_projects/Seatbelt_4.5.exe"
+  register: seatbelt
+
+
+- name: Compile Seatbelt .net 4.5 if not exist
+  command: /usr/bin/msbuild /p:Configuration=Release /p:TargetFrameworkVersion="v4.5" /p:DebugSymbols=false /p:DebugType=None /p:CopyOutputSymbolsToPublishDirectory=false "{{ tool_path }}Seatbelt/Seatbelt.csproj"
+  when: seatbelt.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}"
+
+
+- name: Move Seatbelt.exe to compiled_dotnet_projects
+  command: "mv {{ tool_path }}Seatbelt/bin/Release/Seatbelt.exe {{ tools_root }}/windows/compiled_dotnet_projects/Seatbelt_4.5.exe"
+  when: seatbelt.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}"
+
+
+###########
+## SharpUp
+- name: Set sharpup path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'sharpup' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Check if SharpUp_4.5.exe exists
+  stat:
+    path: "{{ tools_root }}/windows/compiled_dotnet_projects/SharpUp_4.5.exe"
+  register: sharpup
+
+  
+- name: Compile SharpUp .net 4.5 if not exist
+  command: /usr/bin/msbuild /p:Configuration=Release /p:TargetFrameworkVersion="v4.5" /p:DebugSymbols=false /p:DebugType=None /p:CopyOutputSymbolsToPublishDirectory=false "{{ tool_path }}/SharpUp/SharpUp.csproj"
+  when: sharpup.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+- name: Move SharpUp.exe to compiled_dotnet_projects
+  command: "mv {{ tool_path  }}/SharpUp/bin/Release/SharpUp.exe {{ tools_root }}/windows/compiled_dotnet_projects/SharpUp_4.5.exe"
+  when: sharpup.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+  
+###########
+## SharpDump
+- name: Set sharpdump path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'sharpdump' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Check if SharpDump_4.5.exe exists
+  stat:
+    path: "{{ tools_root }}/windows/compiled_dotnet_projects/SharpDump_4.5.exe"
+  register: sharpdump
+
+
+- name: Compile SharpDump .net 4.5 if not exist
+  command: /usr/bin/msbuild /p:Configuration=Release /p:TargetFrameworkVersion="v4.5" /p:DebugSymbols=false /p:DebugType=None /p:CopyOutputSymbolsToPublishDirectory=false "{{ tool_path }}/SharpDump/SharpDump.csproj"
+  when: sharpdump.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+- name: Move SharpDump.exe to compiled_dotnet_projects
+  command: "mv {{ tool_path  }}/SharpDump/bin/Release/SharpDump.exe {{ tools_root }}/windows/compiled_dotnet_projects/SharpDump_4.5.exe"
+  when: sharpdump.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+###########
+## SafetyKatz 
+- name: Set safetykatz path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'safetykatz' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Check if SafetyKatz_4.5.exe exists
+  stat:
+    path: "{{ tools_root }}/windows/compiled_dotnet_projects/SafetyKatz_4.5.exe"
+  register: safetykatz
+
+
+- name: Compile SafetyKatz .net 4.5 if not exist
+  command: /usr/bin/msbuild /p:Configuration=Release /p:TargetFrameworkVersion="v4.5" /p:DebugSymbols=false /p:DebugType=None /p:CopyOutputSymbolsToPublishDirectory=false "{{ tool_path }}/SafetyKatz/SafetyKatz.csproj"
+  when: safetykatz.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+- name: Move SafetyKatz.exe to compiled_dotnet_projects
+  command: "mv {{ tool_path  }}/SafetyKatz/bin/Release/SafetyKatz.exe {{ tools_root }}/windows/compiled_dotnet_projects/SafetyKatz_4.5.exe"
+  when: safetykatz.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+  
+###########
+## SharpDPAPI   
+- name: Set sharpdpapi path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'sharpdpapi' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Check if SharpDPAPI_4.5.exe exists
+  stat:
+    path: "{{ tools_root }}/windows/compiled_dotnet_projects/SharpDPAPI_4.5.exe"
+  register: sharpdpapi
+
+
+- name: Compile SharpDPAPI .net 4.5 if not exist
+  command: /usr/bin/msbuild /p:Configuration=Release /p:TargetFrameworkVersion="v4.5" /p:DebugSymbols=false /p:DebugType=None /p:CopyOutputSymbolsToPublishDirectory=false "{{ tool_path }}/SharpDPAPI/SharpDPAPI.csproj"
+  when: sharpdpapi.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+- name: Move SharpDPAPI.exe to compiled_dotnet_projects
+  command: "mv {{ tool_path  }}/SharpDPAPI/bin/Release/SharpDPAPI.exe {{ tools_root }}/windows/compiled_dotnet_projects/SharpDPAPI_4.5.exe"
+  when: sharpdpapi.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+###########
+## SharpChrome
+- name: Set sharpchrome path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'sharpchrome' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Check if SharpChrome_4.5.exe exists
+  stat:
+    path: "{{ tools_root }}/windows/compiled_dotnet_projects/SharpChrome_4.5.exe"
+  register: sharpchrome
+
+
+- name: Compile SharpChrome .net 4.5 if not exist
+  command: /usr/bin/msbuild /p:Configuration=Release /p:TargetFrameworkVersion="v4.5" /p:DebugSymbols=false /p:DebugType=None /p:CopyOutputSymbolsToPublishDirectory=false "{{ tool_path }}/SharpChrome/SharpChrome.csproj"
+  when: sharpchrome.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+- name: Move SharpChrome.exe to compiled_dotnet_projects
+  command: "mv {{ tool_path  }}/SharpChrome/bin/Release/SharpChrome.exe {{ tools_root }}/windows/compiled_dotnet_projects/SharpChrome_4.5.exe"
+  when: sharpchrome.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+###########
+## InternalMonologue
+- name: Set internalmonologue path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'internal-monologue' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Check if InternalMonologue_4.5.exe exists
+  stat:
+    path: "{{ tools_root }}/windows/compiled_dotnet_projects/InternalMonologue_4.5.exe"
+  register: internalmonologue
+
+
+- name: Compile InternalMonologue .net 4.5 if not exist
+  command: /usr/bin/msbuild /p:Configuration=Release /p:TargetFrameworkVersion="v4.5" /p:DebugSymbols=false /p:DebugType=None /p:CopyOutputSymbolsToPublishDirectory=false "{{ tool_path }}/InternalMonologueExe/InternalMonologueExe.csproj"
+  when: internalmonologue.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+- name: Move InternalMonologue.exe to compiled_dotnet_projects
+  command: "mv {{ tool_path  }}/InternalMonologueExe/bin/Release/InternalMonologue.exe {{ tools_root }}/windows/compiled_dotnet_projects/InternalMonologue_4.5.exe"
+  when: internalmonologue.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+###########
+## SharpWMI    
+- name: Set sharpwmi path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', git_repos) }}"
+  when: "'sharpwmi' in item.key" 
+
+
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: Check if SharpWMI_4.5.exe exists
+  stat:
+    path: "{{ tools_root }}/windows/compiled_dotnet_projects/SharpWMI_4.5.exe"
+  register: sharpwmi
+
+
+- name: Compile SharpWMI .net 4.5 if not exist
+  command: /usr/bin/msbuild /p:Configuration=Release /p:TargetFrameworkVersion="v4.5" /p:DebugSymbols=false /p:DebugType=None /p:CopyOutputSymbolsToPublishDirectory=false "{{ tool_path }}/SharpWMI/SharpWMI.csproj"
+  when: sharpwmi.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+- name: Move SharpWMI.exe to compiled_dotnet_projects
+  command: "mv {{ tool_path }}/SharpWMI/bin/Release/SharpWMI.exe {{ tools_root }}/windows/compiled_dotnet_projects/SharpWMI_4.5.exe"
+  when: sharpwmi.stat.exists == False
+  args:
+    chdir: "{{ tool_path }}/"
+
+
+
+
+
+
