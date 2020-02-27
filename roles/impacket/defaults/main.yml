@@ -1,0 +1,9 @@
+---
+## defaults main.yml for role: impacket
+
+tools_root: /tools
+
+git_repos:
+    impacket:
+        category: network
+        url: https://github.com/SecureAuthCorp/impacket

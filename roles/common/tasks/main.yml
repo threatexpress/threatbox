@@ -1,0 +1,252 @@
+---
+## tasks main.yml for role: common
+## This is the common role for this project. It setups the environment and preps the target for the other roles.
+
+##########################
+## OS Settings
+
+- name: Create /etc/skel/.config if non-existent
+  file:
+    path: "/etc/skel/.config"
+    state: directory
+  
+- name: update xfce /etc/skel files
+  unarchive:
+      src: skel_xfce.tar.gz 
+      dest: /etc/skel/.config 
+
+- name: Create {{ operator_username }} user
+  user:
+    name: "{{ operator_username }}"
+    password: "{{ operator_password }}"
+    groups: sudo 
+    state: present
+    shell: /bin/bash       # Defaults to /bin/bash
+    system: no             # Defaults to no
+    createhome: yes        # Defaults to yes
+    home: /home/{{ operator_username }}   # Defaults to /home/<username>
+    
+- name: Create file to allow passwordless sudo for {{ operator_username }}
+  blockinfile:
+    create: yes
+    path: /etc/sudoers.d/{{ operator_username }}
+    block: "{{ operator_username }} ALL=(ALL) NOPASSWD:ALL"
+
+- name: Create necessary directories if non-existent
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+    mode: 0750
+  loop: "{{ required_directories }}"
+
+- name: Prepare apt for package installs
+  apt:
+    force_apt_get: yes
+    update_cache: yes
+    upgrade: dist
+    autoremove: yes
+    autoclean: yes
+
+- name: Install aptitude using apt
+  apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+- name: Install packages
+  apt:
+    name: "{{ software_packages }}"
+    state: present
+    update_cache: yes
+
+## Python
+- name: Install pip3.7 pip
+  shell: python3.7 -m pip install pip --upgrade
+
+- name: Set python3.6 as default
+  shell : |
+        update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1 && 
+        update-alternatives --install /usr/bin/python python /usr/bin/python3.6 2 && 
+        update-alternatives --install /usr/bin/python python /usr/bin/python2.7 3 && 
+        update-alternatives --set python /usr/bin/python3.6
+
+- name: Install python2.7 modules
+  pip:
+    state: latest
+    executable: pip2
+    name: "{{ python_modules }}"
+
+- name: Install python3.6 modules
+  pip:
+    state: latest
+    executable: pip3.6
+    name: "{{ python_modules }}"
+
+- name: Install python3.7 modules
+  pip:
+    state: latest
+    executable: pip3.7
+    name: "{{ python_modules }}"
+
+##########################
+## Firewall    
+- name: Allow SSH in UFW
+  ufw: rule=allow port=22 proto=tcp
+
+- name: Allow SSH alternate port in UFW
+  ufw: rule=allow port={{ ansible_port }} proto=tcp
+
+- name: Allow MOSH ports in UFW
+  ufw: rule=allow port=60000:61000 proto=udp
+
+- name: Set firewall default policy
+  ufw: state=enabled policy=reject
+
+##########################
+## Background
+- name: Update background base image 
+  copy:
+    src: background.jpg
+    dest: /usr/share/backgrounds/xfce/background.jpg
+    owner: root
+    mode: "0644"
+
+- name: Get THREATBOX repo git commit
+  shell: git rev-parse HEAD 
+  delegate_to: localhost
+  become: no
+  register: threatbox_version
+
+- name: Add THREATBOX version to background image
+  shell: convert /usr/share/backgrounds/xfce/background.jpg -fill yellow -gravity North -pointsize 20 -annotate +95+500 'Version:{{ threatbox_version.stdout }}' -fill yellow -gravity North -pointsize 20 -annotate -55+530 'https://redteam.guide' /usr/share/backgrounds/xfce/xfce-blue.jpg
+
+- name: Add THREATBOX redteam.guide link to background image
+  shell: convert /usr/share/backgrounds/xfce/background.jpg -fill yellow -gravity North -pointsize 20 -annotate +95+500 'Version:{{ threatbox_version.stdout }}' -fill yellow -gravity North -pointsize 20 -annotate -55+530 'https://redteam.guide' /usr/share/backgrounds/xfce/xfce-teal.jpg
+
+##########################
+## Repositories
+
+- name: Clone git repositories
+  git:
+    repo: "{{ item.value.url }}"
+    dest: "{{ tools_root }}/{{ item.value.category}}/{{ item.key }}"
+    version: "{{ item.value.version }}"
+    recursive: yes
+    update: no # Do not pull if the repo exists. Note: This will not update current repo
+    depth: 1
+  with_dict:
+    "{{ git_repos }}"
+  async: 240
+  poll: 20
+
+#########################
+# Direct file downloads
+
+- name: Create directories for direct download files
+  file:
+    path: "{{  tools_root }}/{{ item.value.category }}/{{ item.key }}"
+    state: directory
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+    mode: 0750
+  with_dict: "{{ direct_download_files }}"
+
+- name: Download direct download files
+  get_url:
+    url: "{{ item.value.url }}"
+    dest: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}"
+    owner: "{{ operator_username }}"
+    group: "{{ operator_username }}"
+    validate_certs: false
+    #force: yes
+    mode: 0755
+  with_dict: "{{ direct_download_files }}"
+  async: 3600
+  poll: 20
+
+- name: Set download file url as variable for reference later.
+  set_fact: 
+    "{{ item.key }}": "{{ item.value.url }}"
+  with_dict: "{{ direct_download_files }}"
+
+##########################
+## THREATBOX documentation
+- name: Add THREATBOX documentation readme.md
+  template: 
+    src: readme.tpl
+    dest: "/home/{{ operator_username }}/Desktop/readme/readme.md"
+    owner: "{{ operator_username }}"
+    mode: "0644"
+
+- name: Add THREATBOX documentation git_repositories.md
+  template: 
+    src: git_repositories.tpl
+    dest: "/home/{{ operator_username }}/Desktop/readme/git_repositories.md"
+    owner: "{{ operator_username }}"
+    mode: "0644"
+
+- name: Add THREATBOX documentation direct_download_files.md
+  template: 
+    src: direct_download_files.tpl
+    dest: "/home/{{ operator_username }}/Desktop/readme/direct_download_files.md"
+    owner: "{{ operator_username }}"
+    mode: "0644"
+
+- name: Add THREATBOX documentation list to direct_download_files.md
+  shell: echo {{ item.key }} | tr -d '\n' && echo " | " | tr -d '\n' && echo {{ item.value.url }} >> /home/{{ operator_username }}/Desktop/readme/direct_download_files.md
+  with_dict: "{{ direct_download_files }}"
+
+- name: Add THREATBOX documentation git repo software list
+  shell: cd {{ tools_root }}/{{ item.value.category }}/{{ item.key }} && a=`git rev-parse HEAD | tr -d '\n' && echo " | " | tr -d '\n' && git show -s --format=%ci HEAD | tr -d '\n' && echo " | " | tr -d '\n'&& git config --get remote.origin.url` && echo $a >> /home/{{ operator_username }}/Desktop/readme/git_repositories.md
+  with_dict: "{{ git_repos }}"
+
+- name: Add THREATBOX documentation software_packages.md
+  template: 
+    src: software_packages.tpl
+    dest: "/home/{{ operator_username }}/Desktop/readme/software_packages.md"
+    owner: "{{ operator_username }}"
+    mode: "0644"
+
+- name: Add THREATBOX documentation software package list
+  args:
+    chdir: "{{ tools_root }}"
+  shell: apt list --installed >> /home/{{ operator_username }}/Desktop/readme/software_packages.md
+
+- name: Add THREATBOX documentation python_modules.md
+  template: 
+    src: python_modules.tpl
+    dest: "/home/{{ operator_username }}/Desktop/readme/python_modules.md"
+    owner: "{{ operator_username }}"
+    mode: "0644"
+
+- name: Add THREATBOX documentation python modules
+  shell: pip freeze >> /home/{{ operator_username }}/Desktop/readme/python_modules.md
+
+##########################
+## THREATBOX bashrc settings
+- name: Add .bash_aliases reference to {{ operator_username }}
+  template: 
+    src: bash_aliases.tpl
+    dest: "/home/{{ operator_username }}/.bash_aliases"
+    mode: "0644"
+
+- name: Add .bash_aliases reference to root
+  template: 
+    src: bash_aliases.tpl
+    dest: "/root/.bash_aliases"
+    mode: "0644"
+
+- name: Add redteamops.rc to {{ operator_username }}
+  copy:
+    src: redteamops.rc
+    dest: "/home/{{ operator_username }}/.redteamops.rc"
+    owner: "{{ operator_username }}"
+    mode: "0644"
+
+- name: Add redteamops.rc to root
+  copy:
+    src: redteamops.rc
+    dest: "/root/.redteamops.rc"
+    owner: root
+    mode: "0644"
+
+

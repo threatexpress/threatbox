@@ -1,15 +1,10 @@
-## Terraform and Ansible
+## Ansible and this project
 
-terraform.tfstate.backup
-.terraform/
-tfplan
-terraform.log
 ansible.log
 ansible.cfg
-
-## OVPN
-
-*.ovpn
+test.yml
+hosts
+threatbox.yml
 
 # vscode
 

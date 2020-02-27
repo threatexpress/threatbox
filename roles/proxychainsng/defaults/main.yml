@@ -1,0 +1,9 @@
+---
+## defaults main.yml for role: proxychains-ng
+
+tools_root: /tools
+
+git_repos:
+    proxychains-ng:
+        category: general
+        url: https://github.com/rofl0r/proxychains-ng

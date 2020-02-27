@@ -1,0 +1,315 @@
+---
+## defaults main.yml for role: common
+########################
+# Ansible Variables
+ansible_user: root
+ansible_ssh_private_key_file: ~/.ssh/threatbox_id_rsa
+# NOTE: This project will start on Port 22 and update the SSH configuration to this port
+ansible_port: "52222"
+
+
+########################
+# Platform variables
+
+# Ubuntu version
+ubuntu_version: "bionic"
+
+# Default user
+
+operator_username: "operator"
+#https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+# Clear password: 'operatorPassword123!@#'
+operator_password: '$6$o3Td5VWG4Ouf.TzZ$FKp3XkAMT0T4ntaGXKFSo414pzyJHFGrAekd6NVRqY3lvT6PB.X9m7D119xv.vwmKrBL38pjRIlpOveP.3H.V.'
+
+# Tools directory 
+tools_root: /tools
+
+# Engagement and operator logs directory
+logs_root: /data
+
+# VNC Auth password 
+# NOTE
+#     must be atleast 6 characters)
+#     the variable feeds this command to a oneliner password change and include the appropriate quotes
+#       printf {{ vnc_password_cmd }} | vncpasswd
+vnc_password_cmd: '"operator\noperator\nn"'
+
+########################
+# Required directories
+required_directories: [
+    "{{ tools_root }}",
+    "{{ logs_root }}",
+    "/etc/event_skeleton",
+    "/etc/event_skeleton/0-admin",
+    "/etc/event_skeleton/1-osint",
+    "/etc/event_skeleton/2-recon",
+    "/etc/event_skeleton/3-targets",
+    "/etc/event_skeleton/4-screenshots",
+    "/etc/event_skeleton/5-payloads",
+    "/etc/event_skeleton/6-logs",
+    "/home/{{ operator_username }}/.vnc",
+    "/home/{{ operator_username }}/Desktop/readme",
+]
+
+########################
+# Software Packages to install via apt
+software_packages: [
+    apt-transport-https,
+    ca-certificates,
+    software-properties-common,
+    build-essential,
+    curl,
+    dpkg,
+    firefox,
+    gnupg,
+    git,
+    imagemagick-6.q16,   
+    openjdk-8-jre,
+    john,
+    jq,
+    libgmp-dev,
+    libbz2-dev,
+    libffi-dev,
+    libpcap-dev,
+    libpcap0.8,
+    libssl-dev,
+    nmap,
+    nuget,
+    mosh,
+    p7zip-full,
+    pkg-config,
+    python-crypto,
+    python-dev,
+    python-libpcap,
+    python-lzma,
+    python-pip,
+    python3,
+    python3.7,
+    python3.7-dev,
+    python3-pip,
+    python3-apt,
+    python-crypto,
+    python-pyasn1,
+    python-twisted-core,
+    virtualenv,
+    python3-setuptools,
+    smbclient,
+    tcpdump,
+    tightvncserver,
+    tmux,
+    unrar,
+    wget,
+    wireshark,
+    xfce4,
+    xfce4-goodies,
+    xfce4-terminal,
+    unzip,
+    openjdk-8-jdk,
+    openjdk-8-jre,
+    binwalk,
+    tigervnc-standalone-server,
+    tigervnc-xorg-extension,
+    tshark,
+    ufw,
+    freerdp2-x11,
+    yasm
+]   
+
+########################
+# Git repository list
+# NOTE: Versions are controlled by the version specified. HEAD equals latest version
+# NOTE: uses key:{value}
+#       key: first level
+#       value.X : 2nd level item
+#       value.Y : 2nd level item
+#   key (General label. Used for things such as creating a base directory)
+#       category: (Category label, Use to store in a category directory)
+#       url: (Download URL, URL to file to download)
+#       version: (Version of the repo to pull)
+
+git_repos:
+    impacket:
+        category: network
+        url: https://github.com/SecureAuthCorp/impacket
+        version: HEAD
+    inveigh: 
+        category: network
+        url: https://github.com/Kevin-Robertson/Inveigh
+        version: HEAD
+    responder:
+        category: network
+        url: https://github.com/lgandx/Responder
+        version: HEAD
+    johntheripper:
+        category: password
+        url: https://github.com/magnumripper/JohnTheRipper
+        version: HEAD
+    domainpasswordspray:    
+        category: password
+        url: https://github.com/dafthack/DomainPasswordSpray
+        version: HEAD
+    tinyshell:    
+        category: web
+        url: https://github.com/threatexpress/tinyshell
+        version: HEAD
+    invoke-thehash:
+        category: windows
+        url: https://github.com/Kevin-Robertson/Invoke-TheHash
+        version: HEAD
+    seatbelt:
+        category: ghostpack
+        url: https://github.com/GhostPack/Seatbelt
+        version: HEAD
+    sharpup:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpUp
+        version: HEAD
+    sharpdump:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpDump
+        version: HEAD
+    safetykatz:
+        category: ghostpack
+        url: https://github.com/GhostPack/SafetyKatz
+        version: HEAD
+    sharpwmi:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpWMI
+        version: HEAD
+    sharpdpapi:
+        category: ghostpack
+        url: https://github.com/GhostPack/SharpDPAPI
+        version: HEAD
+    internal-monologue:
+        category: windows
+        url: https://github.com/eladshamir/Internal-Monologue
+        version: HEAD
+    powersploit:
+        category: windows
+        url: https://github.com/PowerShellMafia/PowerSploit
+        version: dev
+    elite:
+        category: c2
+        url: https://github.com/cobbr/Elite
+        version: HEAD
+    covenant:
+        category: c2
+        url: https://github.com/cobbr/Covenant
+        version: HEAD
+    red-teaming-toolkit:
+        category: resource
+        url: https://github.com/infosecn1nja/Red-Teaming-Toolkit
+        version: HEAD
+    awesome-red-teaming:
+        category: resource
+        url: https://github.com/yeyintminthuhtut/Awesome-Red-Teaming
+        version: HEAD
+    domainhunter:
+        category: recon
+        url: https://github.com/threatexpress/domainhunter
+        version: HEAD
+    c2modrewrite:
+        category: c2
+        url: https://github.com/threatexpress/cs2modrewrite
+        version: HEAD
+    red-team-scripts:
+        category: resource
+        url: https://github.com/threatexpress/red-team-scripts
+        version: HEAD
+    malleable-c2:
+        category: c2
+        url: https://github.com/threatexpress/malleable-c2
+        version: HEAD
+    pasties:
+        category: resource
+        url: https://github.com/threatexpress/pasties
+        version: HEAD
+    edc:
+        category: reporting
+        url: https://github.com/threatexpress/edc
+        version: HEAD
+    eyewitness:
+        category: web
+        url: https://github.com/FortyNorthSecurity/EyeWitness.git
+        version: HEAD
+    sqlmap:
+        category: web
+        url: https://github.com/sqlmapproject/sqlmap.git
+        version: HEAD
+    sharpclipboard:
+        category: windows
+        url: https://github.com/slyd0g/SharpClipboard.git
+        version: HEAD
+    powerupsql:
+        category: privesc
+        url: https://github.com/NetSPI/PowerUpSQL.git
+        version: HEAD
+    silenttrinity:
+        category: c2
+        url: https://github.com/byt3bl33d3r/SILENTTRINITY
+        version: HEAD
+    proxychains-ng:
+        category: general
+        url: https://github.com/rofl0r/proxychains-ng
+        version: HEAD
+    crackmapexec:
+        category: c2
+        url: https://github.com/byt3bl33d3r/crackmapexec
+        version: HEAD
+    sprayingtoolkit:
+        category: privesc
+        url: https://github.com/byt3bl33d3r/SprayingToolkit
+        version: HEAD
+
+########################
+# Files to be directly downloaded
+# NOTE: Versions are controlled by the URL source
+# NOTE: uses key:{value}
+#       key: first level
+#       value.X : 2nd level item
+#       value.Y : 2nd level item
+# key (General label. Used for things such as creating a base directory)
+#     category: (Category label, Use to store in a category directory)
+#     url: (Download URL, URL to file to download)
+
+direct_download_files:
+    rockyou:
+        category: password
+        url:  http://downloads.skullsecurity.org/passwords/rockyou.txt.bz2
+    merlin:
+        category: c2
+        url:  https://github.com/Ne0nd0g/merlin/releases/download/v0.7.0/merlinServer-Linux-x64-v0.7.0.BETA.7z
+    sysinternals:
+        category: windows
+        url:  https://download.sysinternals.com/files/SysinternalsSuite.zip
+    metasploit:
+        category: c2
+        url:  https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb
+    burpsuite:
+        category: web
+        url:  https://portswigger.net/burp/releases/download?product=community&version=2020.1&type=Linux
+    bloodhound:
+        category: enumeration
+        url:  https://github.com/BloodHoundAD/BloodHound/releases/download/3.0.1/BloodHound-linux-x64.zip
+    sharphoundEXE:
+        category: enumeration
+        url:  https://github.com/BloodHoundAD/BloodHound/blob/master/Ingestors/SharpHound.exe
+    sharphoundPS1:
+        category: enumeration
+        url:  https://github.com/BloodHoundAD/BloodHound/blob/master/Ingestors/SharpHound.ps1
+
+########################
+# Python Modules to install 
+python_modules: [
+    pip,
+    boto3,
+    docopt,
+    xmltodict,
+    requests,
+    argparse,
+    certifi,
+    chardet,
+    idna,
+    urllib3,
+    pipenv,
+]

@@ -1,0 +1,9 @@
+---
+## defaults main.yml for role: merlin
+
+tools_root: /tools
+
+direct_download_files:
+    merlin:
+        category: c2
+        url:  https://github.com/Ne0nd0g/merlin/releases/download/v0.7.0/merlinServer-Linux-x64-v0.7.0.BETA.7z

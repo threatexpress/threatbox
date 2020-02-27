@@ -1,0 +1,9 @@
+---
+## defaults main.yml for role: metasploit
+
+tools_root: /tools
+
+direct_download_files:
+    metasploit:
+        category: c2
+        url:  https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb

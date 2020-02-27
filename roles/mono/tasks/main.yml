@@ -1,0 +1,27 @@
+## tasks main.yml for role: mono
+---
+##########################
+# Install Mono (Used to compile .net projects)
+- name: Keyring for Mono
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+    state: present
+
+- name: Add Mono Repository
+  apt_repository:
+    repo: deb https://download.mono-project.com/repo/ubuntu stable-bionic main
+    state: present
+
+- name: Install Mono packages
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - mono-runtime
+      - mono-dbg
+      - mono-devel
+      - mono-complete
+      - ca-certificates-mono

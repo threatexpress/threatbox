@@ -1,0 +1,112 @@
+---
+## tasks main.yml for role: bloodhound
+## This role installs bloodhound
+
+##########################
+## Install bloodhound
+
+## Note: Download of the source is controlled in the threatbox.yml file. 
+##       It's best to enable all downloads in that file. 
+##       This help to maintain software package tracking.
+
+- name: Set bloodhound path variable
+  set_fact:
+      tool_path: "{{ tools_root }}/{{ item.value.category }}/{{ item.key }}/"
+  loop: "{{ lookup('dict', direct_download_files) }}"
+  when: "'bloodhound' in item.key" 
+
+
+### Check if tool_path exists
+- name: check for tool_path ({{ tool_path }})
+  stat:
+    path: "{{ tool_path }}"
+  register: tp
+
+
+- name: fail if tool_path ({{ tool_path }}) does not exist
+  fail: msg="The directory does not exist"
+  when: not tp.stat.exists  
+
+
+- name: bloodhound - install required packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - nodejs
+    - npm
+
+
+- name: bloodhound - Add neo4j repo key
+  apt_key:
+    url: https://debian.neo4j.org/neotechnology.gpg.key
+    state: present
+
+- name: bloodhound - Add neo4j repo
+  apt_repository:
+    repo: deb http://debian.neo4j.org/repo stable/
+    state: present
+
+- name: bloodhound - install neo4j package
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - neo4j
+
+
+- name: bloodhound - neo4j setup1
+  shell: echo "dbms.active_database=graph.db" >> /etc/neo4j/neo4j.conf
+
+
+- name: bloodhound - neo4j setup2
+  shell: echo "dbms.connector.http.address=0.0.0.0:7474" >> /etc/neo4j/neo4j.conf
+
+
+- name: bloodhound - neo4j setup3
+  shell: echo "dbms.connector.bolt.address=0.0.0.0:7687" >> /etc/neo4j/neo4j.conf
+
+
+- name: bloodhound - neo4j setup4
+  shell: echo "dbms.allow_format_migration=true" >> /etc/neo4j/neo4j.conf
+
+
+- name: Uncompress bloodhound release
+  unarchive:
+    src: "{{ tool_path }}/{{ item.value.url | basename }}"
+    dest: "{{ tool_path }}"
+    group: "{{ operator_username }}"
+    owner: "{{ operator_username }}"
+    remote_src: yes
+  loop: "{{ lookup('dict', direct_download_files) }}"
+  when: "'bloodhound' in item.key" 
+
+
+# - name: bloodhoud - npm install -g electron-packager
+#   shell:  npm install -g electron-packager
+#   args:
+#     chdir: "{{ tool_path }}"
+# 
+
+# - name: bloodhoud - npm install
+#   shell:  npm install
+#   args:
+#     chdir: "{{ tool_path }}"
+#   async: 3600
+#   poll: 20
+# 
+
+# - name: bloodhoud - npm run linuxbuild
+#   shell:  npm run linuxbuild
+#   args:
+#     chdir: "{{ tool_path }}"
+#   async: 3600
+#   poll: 20
+# 
+
+- name: bloodhound - neo4j start
+  service:
+    name: neo4j
+    state: started
