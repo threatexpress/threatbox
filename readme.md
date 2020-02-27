@@ -129,6 +129,10 @@ Tracking of all installed tools ![Tool Tracking](images/tool_tracking.png)
 
 Automatic terminal logging ![Teminal Loggind](images/terminal_logs.png)
 
+Custom terminal options provide more context ![](images/custom_terminal.png)
+
+Light version of the terminal ![](images/light_terminal.png)
+
 Pipenv keep Python projects independent ![pipenv shell](images/pipenv_shell.png)
 
 Example of SilentTrinity running in pipenv environment ![silenttrinity](images/pipenv.png)
