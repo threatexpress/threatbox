@@ -34,7 +34,7 @@ function get_timestamp {
 
 function my_ip {
    # Get current local IP addresses
-   /sbin/ip -4 addr show | grep 'inet ' | grep 'eth0' | awk '{ print $2 }'
+   /sbin/ip -4 addr show | grep 'inet ' | grep 'eth0' | awk '{ print $2 }' | tr '\n' ' '
 }
 
 function ql {
@@ -94,7 +94,8 @@ UNDERLINE=$(tput smul)
 
 # Color Themes
 #DEFAULT='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-DEFAULT=$PS1
+DEFAULT="[\[\D{%Y-%m-%d %T%z} ${debian_chroot:+($debian_chroot)}\u@\h:\w\]]\$ "
+PS1=$DEFAULT
 
 #     Top curve color                 -                    Checkbox color ( green or red )      - Reset color - timestamp color -       user/host color -  IP color -       downbar color -  curdir color - reset color - text color 
 DARK="\n\[$WHITE\]╭ [\$(if [[ \$? == 0 ]]; then echo \"\[$GREEN\]✓\"; else echo \"\[$RED\]✕\"; fi) \[$WHITE\]\[$YELLOW\]\D{%Y-%m-%d %T%z} \[$WHITE\]\u@\h \[${CYAN}\]$(my_ip)\[$WHITE\]]\n├ [\[$GREEN\]\w\[$WHITE\]]\n\[$WHITE\]╰ "
@@ -106,7 +107,16 @@ PS1=$THEME
 
 # Set theme for default prompt
 function theme_default() {
-     PS1=$DEFAULT
+     if [ "$EUID" -ne 0 ]; then
+        p="$ "
+        PS1=$DEFAULT$p  
+        setterm --inversescreen off  
+     else 
+        p="# "
+        PS1=$DEFAULT$p
+        setterm --inversescreen off   
+     fi
+
 }
 
 # Set theme for neutral prompt

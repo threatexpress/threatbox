@@ -23,3 +23,5 @@
   apt: update_cache=yes name=code state=latest
 
 
+- name: Make VSCode default editor
+  shell: xdg-mime default code.desktop text/plain

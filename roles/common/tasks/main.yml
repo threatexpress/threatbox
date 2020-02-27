@@ -129,6 +129,7 @@
   git:
     repo: "{{ item.value.url }}"
     dest: "{{ tools_root }}/{{ item.value.category}}/{{ item.key }}"
+    version: "{{ item.value.version }}"
     recursive: yes
     update: no # Do not pull if the repo exists. Note: This will not update current repo
     depth: 1
@@ -169,55 +170,55 @@
 
 ##########################
 ## THREATBOX documentation
-- name: Add THREATBOX readme.md
+- name: Add THREATBOX documentation readme.md
   template: 
     src: readme.tpl
     dest: "/home/{{ operator_username }}/Desktop/readme/readme.md"
     owner: "{{ operator_username }}"
     mode: "0644"
 
-- name: Add THREATBOX git_repositories.md
+- name: Add THREATBOX documentation git_repositories.md
   template: 
     src: git_repositories.tpl
     dest: "/home/{{ operator_username }}/Desktop/readme/git_repositories.md"
     owner: "{{ operator_username }}"
     mode: "0644"
 
-- name: Add THREATBOX direct_download_files.md
+- name: Add THREATBOX documentation direct_download_files.md
   template: 
     src: direct_download_files.tpl
     dest: "/home/{{ operator_username }}/Desktop/readme/direct_download_files.md"
     owner: "{{ operator_username }}"
     mode: "0644"
 
-- name: Add THREATBOX list to direct_download_files.md
+- name: Add THREATBOX documentation list to direct_download_files.md
   shell: echo {{ item.key }} | tr -d '\n' && echo " | " | tr -d '\n' && echo {{ item.value.url }} >> /home/{{ operator_username }}/Desktop/readme/direct_download_files.md
   with_dict: "{{ direct_download_files }}"
 
-- name: Add THREATBOX git repo software list
+- name: Add THREATBOX documentation git repo software list
   shell: cd {{ tools_root }}/{{ item.value.category }}/{{ item.key }} && a=`git rev-parse HEAD | tr -d '\n' && echo " | " | tr -d '\n' && git show -s --format=%ci HEAD | tr -d '\n' && echo " | " | tr -d '\n'&& git config --get remote.origin.url` && echo $a >> /home/{{ operator_username }}/Desktop/readme/git_repositories.md
   with_dict: "{{ git_repos }}"
 
-- name: Add THREATBOX software_packages.md
+- name: Add THREATBOX documentation software_packages.md
   template: 
     src: software_packages.tpl
     dest: "/home/{{ operator_username }}/Desktop/readme/software_packages.md"
     owner: "{{ operator_username }}"
     mode: "0644"
 
-- name: Add THREATBOX software package list
+- name: Add THREATBOX documentation software package list
   args:
     chdir: "{{ tools_root }}"
   shell: apt list --installed >> /home/{{ operator_username }}/Desktop/readme/software_packages.md
 
-- name: Add THREATBOX python_modules.md
+- name: Add THREATBOX documentation python_modules.md
   template: 
     src: python_modules.tpl
     dest: "/home/{{ operator_username }}/Desktop/readme/python_modules.md"
     owner: "{{ operator_username }}"
     mode: "0644"
 
-- name: Add THREATBOX software package list
+- name: Add THREATBOX documentation python modules
   shell: pip freeze >> /home/{{ operator_username }}/Desktop/readme/python_modules.md
 
 ##########################

@@ -8,7 +8,6 @@
 - debug:
     msg: Starting SSH config # not required. The customized message that is printed. If omitted, prints a generic message.
 
-
 # ansible_port can change throughout this role, keep a copy around
 - name: Set configured port ({{ ansible_port }}) fact 
   set_fact:
@@ -29,7 +28,6 @@
   register: default_ssh
   become: no
 
-
 # If reachable, continue the following tasks with this port
 - name: Set inventory ansible_port to default port 22
   set_fact:
@@ -38,7 +36,6 @@
         default_ssh.state is defined and
         default_ssh.state == "started"
   register: ssh_port_set
-
 
 # If unreachable on port 22, check if we're able to reach
 # {{ inventory_hostname }} on {{ ansible_port }} provided by the inventory
@@ -58,7 +55,6 @@
         default_ssh.state is defined and
         default_ssh.state == "started"
 
-
 # If {{ ansible_port }} is reachable, we don't need to do anything special
 - name: SSH port ({{ ansible_port }}) is configured properly
   debug:
@@ -68,18 +64,15 @@
         configured_ssh.state == "started"
   register: ssh_port_set
  
-
 # If the SSH port is neither the default or the configured, give up.
 - name: Fail if SSH port was not auto-detected (unknown)
   fail:
     msg: "The SSH port is neither 22 or {{ ansible_port }}."
   when: ssh_port_set is undefined
 
-
 # Sanity check, make sure Ansible is able to connect to the host
 - name: Confirm host connection works
   ping:
-
 
 - name: Setup alternate SSH port ({{ configured_port }})
   lineinfile:
@@ -89,12 +82,10 @@
   notify: "Restart sshd"
   become: yes
 
-
 # We notified "Restart sshd" if we modified the sshd config.
 # By calling flush_handlers, we make sure the handler is run *right now*
 - name: Ensure SSH is reloaded if need be
   meta: flush_handlers
-
 
 # We're done, make sure ansible_port is set properly so that any tasks
 # after this use the right ansible_port.
@@ -102,7 +93,6 @@
   set_fact:
     ansible_port: "{{ configured_port }}"
     cacheable: yes
-
 
 # Gather facts should be set to false when running this role since it will
 # fail if the Ansible SSH port is not set correctly.
